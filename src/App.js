@@ -1,25 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { connect } from 'react-redux';
+import { firestore, convertCollectionSnapshsotToMap } from './firebase';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import { fetchUsers } from './redux/user/user.action';
+import User from './components/user.component';
+
+
+class App extends React.Component {
+    unsubscribeFromSnapshot = null;
+    
+    componentDidMount() {
+        const { fetchUsers } = this.props;
+        
+        const collectionUserRef = firestore.collection('users');
+        collectionUserRef.onSnapshot(async snapshot => {
+            const userCollectionMap=convertCollectionSnapshsotToMap(snapshot);
+            fetchUsers(userCollectionMap);
+        });
+    }
+
+    render() {
+        return (
+            <div>
+               <User/>
+            </div>
+        );
+    }
 }
 
-export default App;
+const mapDispatchToProps = (dispatch) => {
+    return {fetchUsers:(users)=>dispatch(fetchUsers(users))}
+}
+
+export default connect(null,mapDispatchToProps)(App);
