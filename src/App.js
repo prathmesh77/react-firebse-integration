@@ -7,7 +7,6 @@ import User from './components/user.component';
 
 
 class App extends React.Component {
-    unsubscribeFromSnapshot = null;
     
     componentDidMount() {
         const { fetchUsers } = this.props;
